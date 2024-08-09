@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MIDI to Oscillator</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi"></script>
+</head>
+<body>
+    <h1 style="font-weight: 400;">MIDI to Oscillator</h1>
+    <input type="file" id="midiFileInput" accept=".mid" />
+    <select id="waveformSelect">
+        <option value="sine">Sine Wave</option>
+        <option value="square">Square Wave</option>
+        <option value="triangle">Triangle Wave</option>
+        <option value="sawtooth">Sawtooth Wave</option>
+    </select>
+    <div id="progress-container">
+        <div id="progress-bar">0%</div>
+    </div>
+    <p>Get your .mid files <a href="download.php">Here!</a></p>
+    <p>Run "pip install aubio numpy mido soundfile" in you terminal or command propmt then run the script like so:</p>
+    <p>"python audio_to_midi.py input.mp3 output.mid"</p>
+
+    
+    <script>
+        let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let startTime;
+        let totalDuration;
+
+        function playNote(note, duration, startTime) {
+            const waveform = document.getElementById('waveformSelect').value;
+            const oscillator = audioContext.createOscillator();
+            oscillator.type = waveform;
+            oscillator.frequency.setValueAtTime(note, audioContext.currentTime);
+            oscillator.connect(audioContext.destination);
+            oscillator.start(startTime);
+            oscillator.stop(startTime + duration);
+        }
+
+        function midiToFrequency(midiNote) {
+            return 440 * Math.pow(2, (midiNote - 69) / 12);
+        }
+
+        function updateProgressBar() {
+            const elapsedTime = audioContext.currentTime - startTime;
+            const progress = Math.min((elapsedTime / totalDuration) * 100, 100);
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('progress-bar').textContent = Math.round(progress) + '%';
+
+            if (progress < 100) {
+                requestAnimationFrame(updateProgressBar);
+            }
+        }
+
+        function startPlayback() {
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            startTime = audioContext.currentTime;
+            document.getElementById('progress-bar').textContent = '0%';
+            updateProgressBar();
+        }
+
+        document.getElementById('midiFileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const midiData = new Uint8Array(e.target.result);
+                    parseMidi(midiData);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        async function parseMidi(midiData) {
+            try {
+                const midi = new Midi(midiData);
+                const notes = midi.tracks.flatMap(track => track.notes);
+                const durationPerNote = 500;
+                totalDuration = (notes.length * durationPerNote) / 1000;
+
+                startPlayback();
+
+                notes.forEach((note, index) => {
+                    const noteDuration = durationPerNote / 1000;
+                    const noteStartTime = startTime + (index * noteDuration);
+
+                    playNote(midiToFrequency(note.midi), noteDuration, noteStartTime);
+                });
+
+                setTimeout(() => {
+                    document.getElementById('progress-bar').style.width = '100%';
+                    document.getElementById('progress-bar').textContent = '100%';
+                }, totalDuration * 1000);
+
+            } catch (error) {
+                console.error("Error parsing MIDI file:", error);
+            }
+        }
+    </script>
+</body>
+</html>
