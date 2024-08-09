@@ -19,7 +19,7 @@ This project uses [Tone.js](https://github.com/Tonejs/Tone.js) for the oscillato
    cd <repository-directory>
    ```
 
-   or go to the [Github Pages]() I set up
+   or go to the [Github Pages](https://pbitminecraft.github.io/MIDI-to-Oscillator/) I set up
 
 ## Contributing
 
@@ -27,4 +27,4 @@ If you want to contribute to this project, please fork the repository and submit
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE]() file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/PBitMinecraft/MIDI-to-Oscillator/blob/dev/LICENSE.txt) file for details.
