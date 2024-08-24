@@ -1,4 +1,4 @@
-# Project Name
+# MIDI to Oscillator
 
 ## Overview
 
@@ -15,8 +15,8 @@ This project uses [Tone.js](https://github.com/Tonejs/Tone.js) for the oscillato
 1. **Clone the Repository**
 
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone https://github.com/PBitMinecraft/MIDI-to-Oscillator.git
+   cd MIDI-to-Oscillator
    ```
 
    or go to the [Github Pages](https://pbitminecraft.github.io/MIDI-to-Oscillator/) I set up
